@@ -1,19 +1,28 @@
 package com.example.guessinggame
 
+import android.os.Parcel
+import android.os.Parcelable
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class GameViewModel : ViewModel(){
+class GameViewModel : ViewModel() {
 
     private val words = listOf("Strong","Dist","Keep","Port")
     private val secretWord = words.random().uppercase()
-    val secretWordDisplay = MutableLiveData<String>()
+    private val _secretWordDisplay = MutableLiveData<String>()
+    val secretWordDisplay : LiveData<String>
+    get() = _secretWordDisplay
     private var correctGuesses = ""
-    val incorrectGuesses = MutableLiveData("")
-    val livesLeft = MutableLiveData(8)
+    private val _incorrectGuesses = MutableLiveData("")
+    val incorrectGuesses : LiveData<String>
+    get() = _incorrectGuesses
+    private val _livesLeft = MutableLiveData(8)
+    val livesLeft: LiveData<Int>
+    get() = _livesLeft
 
     init {
-        secretWordDisplay.value = deriveSecretWordDisplay()
+        _secretWordDisplay.value = deriveSecretWordDisplay()
     }
 
     private fun deriveSecretWordDisplay() : String{
@@ -33,10 +42,10 @@ class GameViewModel : ViewModel(){
         if (guess.length == 1){
             if (secretWord.contains(guess)){
                 correctGuesses +=guess
-                secretWordDisplay.value =deriveSecretWordDisplay()
+                _secretWordDisplay.value =deriveSecretWordDisplay()
             }else{
-                incorrectGuesses.value += guess
-                livesLeft.value = livesLeft.value?.minus(1)
+                _incorrectGuesses.value += guess
+                _livesLeft.value = livesLeft.value?.minus(1)
             }
         }
     }
@@ -50,4 +59,5 @@ class GameViewModel : ViewModel(){
         message += " the secret word was $secretWord."
         return message
     }
+
 }
