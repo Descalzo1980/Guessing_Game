@@ -5,4 +5,5 @@
     <string name="guess_a_letter">Guess a letter</string>
     <string name="guess">Guess</string>
     <string name="start_new_game">Start new game</string>
+    <string name="nothing_here">Nothing here</string>
 </resources>
