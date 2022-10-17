@@ -1,14 +1,12 @@
 package com.example.guessinggame
 
-import android.os.Parcel
-import android.os.Parcelable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class GameViewModel : ViewModel() {
 
-    private val words = listOf("Strong","Dist","Keep","Port")
+    private val words = listOf("Strong","Dist","Keep","Port","Android")
     private val secretWord = words.random().uppercase()
     private val _secretWordDisplay = MutableLiveData<String>()
     val secretWordDisplay : LiveData<String>
@@ -20,6 +18,9 @@ class GameViewModel : ViewModel() {
     private val _livesLeft = MutableLiveData(8)
     val livesLeft: LiveData<Int>
     get() = _livesLeft
+    private val _gameOver = MutableLiveData(false)
+    val gameOver : LiveData<Boolean>
+        get() = _gameOver
 
     init {
         _secretWordDisplay.value = deriveSecretWordDisplay()
@@ -47,12 +48,13 @@ class GameViewModel : ViewModel() {
                 _incorrectGuesses.value += guess
                 _livesLeft.value = livesLeft.value?.minus(1)
             }
+            if (isWin() || isLost()) _gameOver.value = true
         }
     }
 
-    fun isWin() = secretWord.equals(secretWordDisplay.value,true)
+    private fun isWin() = secretWord.equals(secretWordDisplay.value,true)
 
-    fun isLost() = (livesLeft.value ?: 0) <= 0
+    private fun isLost() = (livesLeft.value ?: 0) <= 0
 
     fun wonLostMessage() : String {
         var message = if (isWin()) "You win," else "You lost,"

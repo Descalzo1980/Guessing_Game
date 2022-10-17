@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import com.example.guessinggame.databinding.FragmentGameBinding
@@ -20,6 +19,7 @@ class GameFragment : Fragment() {
     private lateinit var viewModel: GameViewModel
 
 
+    @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -27,23 +27,25 @@ class GameFragment : Fragment() {
         _binding = FragmentGameBinding.inflate(inflater, container, false)
         val view = binding.root
         viewModel = ViewModelProvider(this)[(GameViewModel::class.java)]
-        viewModel.incorrectGuesses.observe(viewLifecycleOwner, Observer {
-                newValue -> binding.incorrectGuesses.text = "Incorrect guesses: $newValue"
-        })
-        viewModel.livesLeft.observe(viewLifecycleOwner, Observer {
-                newValue -> binding.lives.text = "You have $newValue lives left"
-        })
+        viewModel.incorrectGuesses.observe(viewLifecycleOwner) { newValue ->
+            binding.incorrectGuesses.text = "Incorrect guesses: $newValue"
+        }
+        viewModel.livesLeft.observe(viewLifecycleOwner) { newValue ->
+            binding.lives.text = "You have $newValue lives left"
+        }
         viewModel.secretWordDisplay.observe(viewLifecycleOwner) { newValue ->
             binding.word.text = newValue
+        }
+        viewModel.gameOver.observe(viewLifecycleOwner) { newValue ->
+            if (newValue) {
+                val action = GameFragmentDirections
+                    .actionGameFragmentToResultFragment(viewModel.wonLostMessage())
+                view.findNavController().navigate(action)
+            }
         }
         binding.guessButton.setOnClickListener {
             viewModel.makeGuess(binding.guess.text.toString().uppercase())
             binding.guess.text = null
-            if (viewModel.isWin() || viewModel.isLost()) {
-                val action =
-                    GameFragmentDirections.actionGameFragmentToResultFragment(viewModel.wonLostMessage())
-                view.findNavController().navigate(action)
-            }
         }
         return view
     }
